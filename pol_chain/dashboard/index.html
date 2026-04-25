@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PoL Chain Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #0f172a;
+            --bg-surface: #1e293b;
+            --bg-surface-elevated: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-green: #10b981;
+            --accent-green-bg: rgba(16, 185, 129, 0.15);
+            --accent-red: #ef4444;
+            --accent-red-bg: rgba(239, 68, 68, 0.15);
+            --accent-amber: #f59e0b;
+            --accent-amber-bg: rgba(245, 158, 11, 0.15);
+            --accent-blue: #3b82f6;
+            --border-color: #334155;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --shadow-glow: 0 0 15px rgba(59, 130, 246, 0.5);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9em;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            gap: 2rem;
+        }
+
+        /* 1. HEADER */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            background: var(--bg-surface-elevated);
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--accent-amber);
+            box-shadow: 0 0 8px var(--accent-amber);
+        }
+        
+        .status-badge.online .status-dot {
+            background-color: var(--accent-green);
+            box-shadow: 0 0 8px var(--accent-green);
+        }
+
+        .status-badge.offline .status-dot {
+            background-color: var(--accent-red);
+            box-shadow: 0 0 8px var(--accent-red);
+        }
+
+        /* 2. CONTROLS BAR */
+        .controls {
+            display: flex;
+            gap: 1rem;
+            background: var(--bg-surface);
+            padding: 1.5rem;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+        }
+
+        button {
+            padding: 0.7rem 1.5rem;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            background: var(--bg-surface-elevated);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        button:hover {
+            border-color: var(--accent-blue);
+            box-shadow: var(--shadow-glow);
+            transform: translateY(-2px);
+        }
+        
+        button.danger:hover {
+            border-color: var(--accent-red);
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.5);
+        }
+
+        /* 3. PACKAGE JOURNEY MAP */
+        .journey-map {
+            background: var(--bg-surface);
+            padding: 2.5rem 2rem;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+        }
+
+        .timeline-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            margin-top: 1rem;
+        }
+
+        .timeline-line {
+            position: absolute;
+            top: 25px;
+            left: 50px;
+            right: 50px;
+            height: 4px;
+            background: var(--bg-surface-elevated);
+            z-index: 1;
+        }
+        
+        .timeline-line-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: var(--accent-blue);
+            transition: width 1s ease;
+        }
+
+        .station {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 200px;
+            text-align: center;
+            opacity: 0.4;
+            transition: var(--transition);
+        }
+        
+        .station.active {
+            opacity: 1;
+        }
+
+        .station-dot {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--bg-surface-elevated);
+            border: 3px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            transition: var(--transition);
+        }
+        
+        .station.active .station-dot {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
+            box-shadow: var(--shadow-glow);
+        }
+        
+        .station.flagged .station-dot {
+            background: var(--accent-red);
+            border-color: var(--accent-red);
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.8);
+            animation: pulse-red 2s infinite;
+        }
+
+        .station-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .station-meta {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.2rem;
+        }
+        
+        .station-flag-reason {
+            margin-top: 0.5rem;
+            color: var(--accent-red);
+            font-size: 0.8rem;
+            font-weight: 600;
+            background: var(--accent-red-bg);
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            display: none;
+        }
+        
+        .station.flagged .station-flag-reason {
+            display: block;
+        }
+
+        /* 4. CHAIN EXPLORER */
+        .chain-explorer {
+            background: var(--bg-surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            overflow-x: auto;
+        }
+        
+        .section-title {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background: rgba(0,0,0,0.2);
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            white-space: nowrap;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        tr:hover td {
+            background: rgba(255,255,255,0.02);
+        }
+
+        .status-badge-sm {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .status-valid {
+            background: var(--accent-green-bg);
+            color: var(--accent-green);
+        }
+        
+        .status-invalid {
+            background: var(--accent-red-bg);
+            color: var(--accent-red);
+        }
+
+        /* 5. & 6. BOTTOM PANELS */
+        .bottom-panels {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .panel {
+            background: var(--bg-surface);
+            padding: 1.5rem;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .stat-card {
+            background: rgba(0,0,0,0.2);
+            padding: 1rem;
+            border-radius: var(--radius-md);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .tamper-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        input {
+            padding: 0.7rem 1rem;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            background: rgba(0,0,0,0.2);
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+        }
+
+        /* TOAST NOTIFICATION */
+        .toast-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            z-index: 1000;
+        }
+
+        .toast {
+            background: var(--bg-surface-elevated);
+            color: var(--text-primary);
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius-md);
+            border-left: 4px solid var(--accent-blue);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            transform: translateX(120%);
+            transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            max-width: 400px;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+        
+        .toast.success { border-color: var(--accent-green); }
+        .toast.error { border-color: var(--accent-red); }
+        .toast.warning { border-color: var(--accent-amber); }
+
+        /* LOADING SPINNER */
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            display: none;
+        }
+        
+        .loading .spinner {
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        /* ANIMATED GRADIENT TEXT */
+        .gradient-text {
+            background: linear-gradient(90deg, #3b82f6, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- 1. HEADER -->
+        <header>
+            <h1><span class="gradient-text">PoL Chain</span> — Supply Chain Anti-Counterfeiting</h1>
+            <div id="healthBadge" class="status-badge offline">
+                <div class="status-dot"></div>
+                <span id="healthText">Connecting...</span>
+            </div>
+        </header>
+
+        <!-- 2. CONTROLS BAR -->
+        <div class="controls">
+            <button id="btnNormal" onclick="simulate(false)">
+                ▶ Run Normal Simulation
+                <div class="spinner"></div>
+            </button>
+            <button id="btnAttack" class="danger" onclick="simulate(true)">
+                ⚠ Inject Attack
+                <div class="spinner"></div>
+            </button>
+            <button id="btnVerify" onclick="verifyChain()">
+                🔒 Verify Chain
+                <div class="spinner"></div>
+            </button>
+        </div>
+
+        <!-- 3. PACKAGE JOURNEY MAP -->
+        <div class="journey-map">
+            <div class="section-title" style="padding:0; border:none; margin-bottom: 2rem;">Package Journey: <span class="mono" style="margin-left:10px; color:var(--accent-blue)">PKG-2024-PHARMA-001</span></div>
+            <div class="timeline-container" id="timelineContainer">
+                <div class="timeline-line">
+                    <div class="timeline-line-fill" id="timelineFill" style="width: 0%;"></div>
+                </div>
+                <!-- Stations injected via JS -->
+            </div>
+        </div>
+
+        <!-- 4. CHAIN EXPLORER -->
+        <div class="chain-explorer">
+            <div class="section-title">🔗 Chain Explorer</div>
+            <table id="chainTable">
+                <thead>
+                    <tr>
+                        <th>Block#</th>
+                        <th>Node</th>
+                        <th>Timestamp</th>
+                        <th>Coords</th>
+                        <th>Wi-Fi Beacons</th>
+                        <th>Signature</th>
+                        <th>Prev Hash</th>
+                        <th>Block Hash</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="chainTableBody">
+                    <!-- Rows injected via JS -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- BOTTOM PANELS -->
+        <div class="bottom-panels">
+            <!-- 5. INTEGRITY PANEL -->
+            <div class="panel">
+                <div class="section-title" style="padding:0; border:none;">🛡️ Integrity Panel</div>
+                <div class="stat-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="statTotalBlocks">0</div>
+                        <div class="stat-label">Total Blocks</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statFlaggedBlocks" style="color:var(--accent-red)">0</div>
+                        <div class="stat-label">Flagged Legs</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statValid" style="color:var(--accent-green)">YES</div>
+                        <div class="stat-label">Chain Cryptography Valid</div>
+                    </div>
+                </div>
+                <div style="margin-top: 1.5rem;" id="integrityIssuesContainer">
+                    <div class="stat-label">Integrity Issues Found:</div>
+                    <ul id="integrityIssuesList" style="margin-top:0.5rem; font-size:0.9rem; color:var(--accent-red); padding-left:1.5rem;">
+                        <li>None</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 6. TAMPER SIMULATOR -->
+            <div class="panel">
+                <div class="section-title" style="padding:0; border:none; color:var(--accent-amber)">🦹 Tamper Simulator</div>
+                <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 1rem;">
+                    Simulate an attacker modifying a block's payload in memory after it has been signed.
+                </p>
+                <div class="tamper-form">
+                    <div class="input-group">
+                        <label class="stat-label">Block Index</label>
+                        <input type="number" id="tamperBlockIndex" value="1" min="1">
+                    </div>
+                    <div class="input-group">
+                        <label class="stat-label">New Latitude</label>
+                        <input type="number" step="0.0001" id="tamperLat" value="99.9999">
+                    </div>
+                    <button onclick="tamperBlock()" id="btnTamper" style="width:100%; justify-content:center; margin-top:0.5rem;">
+                        Tamper Block
+                        <div class="spinner"></div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST CONTAINER -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000';
+        let refreshInterval;
+
+        // Utility: Show Toast
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            
+            container.appendChild(toast);
+            
+            // Trigger animation
+            setTimeout(() => toast.classList.add('show'), 10);
+            
+            // Remove after 4s
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // Utility: Format Hash
+        function fmtHash(hash) {
+            if (!hash) return '-';
+            return hash.substring(0, 16) + '...';
+        }
+
+        // 1. HEALTH CHECK
+        async function checkHealth() {
+            try {
+                const res = await fetch(`${API_BASE}/health`);
+                if (res.ok) {
+                    document.getElementById('healthBadge').className = 'status-badge online';
+                    document.getElementById('healthText').textContent = 'API Online';
+                } else {
+                    throw new Error('API down');
+                }
+            } catch (e) {
+                document.getElementById('healthBadge').className = 'status-badge offline';
+                document.getElementById('healthText').textContent = 'API Offline';
+            }
+        }
+
+        // 2. FETCH CHAIN & RENDER
+        async function fetchAndRenderChain() {
+            try {
+                const res = await fetch(`${API_BASE}/api/chain`);
+                const data = await res.json();
+                
+                renderTable(data.chain);
+                renderMap(data.chain);
+                updateIntegrityPanel(data.chain, data.is_valid, data.integrity_issues);
+                
+            } catch (e) {
+                console.error("Failed to fetch chain", e);
+            }
+        }
+
+        // RENDER TABLE
+        function renderTable(chain) {
+            const tbody = document.getElementById('chainTableBody');
+            tbody.innerHTML = '';
+            
+            chain.forEach(block => {
+                const tr = document.createElement('tr');
+                
+                let statusHtml = '';
+                if (block.flagged) {
+                    statusHtml = `<span class="status-badge-sm status-invalid">⚠ FLAGGED: ${block.flag_reason}</span>`;
+                } else {
+                    statusHtml = `<span class="status-badge-sm status-valid">✓ Valid</span>`;
+                }
+
+                tr.innerHTML = `
+                    <td class="mono">${block.block_index}</td>
+                    <td>${block.node_name}</td>
+                    <td class="mono" style="font-size:0.8rem">${block.timestamp.replace('T', ' ')}</td>
+                    <td class="mono" style="font-size:0.8rem">${block.lat.toFixed(4)}, ${block.lon.toFixed(4)}</td>
+                    <td class="mono">${block.wifi_fingerprint.length} beacons</td>
+                    <td class="mono">${fmtHash(block.signature)}</td>
+                    <td class="mono">${fmtHash(block.prev_hash)}</td>
+                    <td class="mono" style="color:var(--accent-blue)">${fmtHash(block.block_hash)}</td>
+                    <td>${statusHtml}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // RENDER MAP
+        function renderMap(chain) {
+            const container = document.getElementById('timelineContainer');
+            const fill = document.getElementById('timelineFill');
+            
+            // Remove existing stations
+            container.querySelectorAll('.station').forEach(e => e.remove());
+            
+            const stations = ['Factory', 'Truck', 'Warehouse', 'Retail Store'];
+            let fillPercentage = 0;
+            
+            // Filter out genesis block for the visual map
+            const journeyBlocks = chain.filter(b => b.block_index > 0);
+
+            stations.forEach((stationName, i) => {
+                const block = journeyBlocks.find(b => b.node_name.includes(stationName) || (i===1 && b.node_name==="Truck") || (i===2 && b.node_name==="Warehouse") || (i===3 && b.node_name==="Retail Store"));
+                
+                const div = document.createElement('div');
+                div.className = `station ${block ? 'active' : ''} ${block?.flagged ? 'flagged' : ''}`;
+                
+                if (block) {
+                    fillPercentage = (i / (stations.length - 1)) * 100;
+                }
+                
+                div.innerHTML = `
+                    <div class="station-dot">${i + 1}</div>
+                    <div class="station-name">${stationName}</div>
+                    ${block ? `
+                        <div class="station-meta mono">${block.timestamp.substring(11, 16)} UTC</div>
+                        <div class="station-meta mono">${block.lat.toFixed(2)}, ${block.lon.toFixed(2)}</div>
+                    ` : '<div class="station-meta">Awaiting...</div>'}
+                    ${block?.flagged ? `<div class="station-flag-reason">${block.flag_reason}</div>` : ''}
+                `;
+                
+                container.appendChild(div);
+            });
+            
+            // If there's a flagged block, make the fill line red
+            if (journeyBlocks.some(b => b.flagged)) {
+                fill.style.background = 'var(--accent-red)';
+                fill.style.borderBottom = '2px dashed var(--accent-red)';
+            } else {
+                fill.style.background = 'var(--accent-blue)';
+                fill.style.borderBottom = 'none';
+            }
+            
+            fill.style.width = `${fillPercentage}%`;
+        }
+
+        // UPDATE INTEGRITY PANEL
+        function updateIntegrityPanel(chain, isValid, issues) {
+            document.getElementById('statTotalBlocks').textContent = chain.length;
+            document.getElementById('statFlaggedBlocks').textContent = chain.filter(b => b.flagged).length;
+            
+            const validEl = document.getElementById('statValid');
+            if (isValid) {
+                validEl.textContent = 'YES';
+                validEl.style.color = 'var(--accent-green)';
+            } else {
+                validEl.textContent = 'NO';
+                validEl.style.color = 'var(--accent-red)';
+            }
+            
+            const list = document.getElementById('integrityIssuesList');
+            list.innerHTML = '';
+            
+            if (issues && issues.length > 0) {
+                issues.forEach(iss => {
+                    const li = document.createElement('li');
+                    li.textContent = iss;
+                    list.appendChild(li);
+                });
+            } else {
+                const li = document.createElement('li');
+                li.textContent = 'None';
+                li.style.color = 'var(--text-secondary)';
+                list.appendChild(li);
+            }
+        }
+
+        // ACTIONS
+        async function simulate(injectAttack) {
+            const btnId = injectAttack ? 'btnAttack' : 'btnNormal';
+            const btn = document.getElementById(btnId);
+            btn.classList.add('loading');
+            
+            try {
+                const res = await fetch(`${API_BASE}/api/simulate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ inject_attack: injectAttack })
+                });
+                if (res.ok) {
+                    showToast(`Simulation (${injectAttack ? 'Attack' : 'Normal'}) generated!`, 'success');
+                    fetchAndRenderChain();
+                }
+            } catch (e) {
+                showToast('Failed to trigger simulation', 'error');
+            } finally {
+                btn.classList.remove('loading');
+            }
+        }
+
+        async function verifyChain() {
+            const btn = document.getElementById('btnVerify');
+            btn.classList.add('loading');
+            
+            try {
+                const res = await fetch(`${API_BASE}/api/chain/verify`);
+                const data = await res.json();
+                
+                if (data.valid) {
+                    showToast('Chain is cryptographically VALID', 'success');
+                } else {
+                    showToast(`Chain is BROKEN! ${data.issues.length} issues found.`, 'error');
+                }
+                
+                // Refresh to get updated integrity panel
+                fetchAndRenderChain();
+            } catch (e) {
+                showToast('Verification failed', 'error');
+            } finally {
+                btn.classList.remove('loading');
+            }
+        }
+
+        async function tamperBlock() {
+            const btn = document.getElementById('btnTamper');
+            const bIdx = document.getElementById('tamperBlockIndex').value;
+            const newLat = document.getElementById('tamperLat').value;
+            
+            if (!bIdx || !newLat) {
+                showToast('Please enter block index and latitude', 'warning');
+                return;
+            }
+            
+            btn.classList.add('loading');
+            
+            try {
+                const res = await fetch(`${API_BASE}/api/tamper`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        block_index: parseInt(bIdx), 
+                        new_lat: parseFloat(newLat) 
+                    })
+                });
+                
+                const data = await res.json();
+                
+                if (res.ok) {
+                    showToast(`Tampered Block ${bIdx}!`, 'warning');
+                    fetchAndRenderChain();
+                    
+                    setTimeout(() => {
+                        if (!data.valid) {
+                            showToast(`Tampering caught: ${data.issues[0]}`, 'error');
+                        }
+                    }, 1000);
+                } else {
+                    showToast(`Error: ${data.error}`, 'error');
+                }
+            } catch (e) {
+                showToast('Tampering request failed', 'error');
+            } finally {
+                btn.classList.remove('loading');
+            }
+        }
+
+        // INITIALIZATION
+        window.onload = () => {
+            checkHealth();
+            fetchAndRenderChain();
+            
+            setInterval(checkHealth, 5000);
+            
+            refreshInterval = setInterval(fetchAndRenderChain, 10000);
+        };
+    </script>
+</body>
+</html>

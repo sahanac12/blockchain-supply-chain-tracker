@@ -1,0 +1,148 @@
+{
+  "chain": [
+    {
+      "block_index": 0,
+      "package_id": "GENESIS",
+      "node_id": "ORIGIN",
+      "node_name": "ORIGIN",
+      "timestamp": "2026-04-25T17:57:52.269169+00:00",
+      "lat": 0.0,
+      "lon": 0.0,
+      "wifi_fingerprint": [],
+      "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "claim_hash": "072f31fafd009053d0d47ac1e58b896762d5f24496655596f2423d939722b1f6",
+      "signature": "GENESIS_SIG",
+      "block_hash": "ba09ef9b4a25c2de029ea2e1005860bcd9570828eb1064568853088537be4d4f",
+      "flagged": false,
+      "flag_reason": ""
+    },
+    {
+      "block_index": 1,
+      "package_id": "PKG-2024-PHARMA-001",
+      "node_id": "decc25f9-523c-4bab-b298-e2e2f0705605",
+      "node_name": "Factory",
+      "timestamp": "2024-01-15T06:00:00Z",
+      "lat": 13.0827,
+      "lon": 80.2707,
+      "wifi_fingerprint": [
+        {
+          "bssid": "00:11:22:33:44:55",
+          "rssi": -45,
+          "ssid": "Factory_WIFI_1"
+        },
+        {
+          "bssid": "00:11:22:33:44:56",
+          "rssi": -60,
+          "ssid": "Factory_WIFI_2"
+        },
+        {
+          "bssid": "00:11:22:33:44:57",
+          "rssi": -72,
+          "ssid": "Factory_Guest"
+        }
+      ],
+      "prev_hash": "ba09ef9b4a25c2de029ea2e1005860bcd9570828eb1064568853088537be4d4f",
+      "claim_hash": "9f25bdce4f039199e8992f177b149525b3ee1298291354f618e9928084b3ed96",
+      "signature": "g9aPFHKYa1TcOJYNCWWrJ/Evo78YqSpwtn862KPMoGvRd8TY0UYuRmJeKl0c/LkIzsh7CDWUrsPEqa6sWs1iVJPKM6+Ypwc7Yyce9PfZxz1Jq5iIcoH42R08/7YN96SmQ86YjNznvPXF9L3/8OiRM1sxY0vDkqDsXOsnCQJgEsi6Tw8BbH48wNcLdio3RHM/GAD5In6x3KNTOLtA7zDylQsYTpTt9EMgnxx0tCKeDm67DPbaUC4phVlK0Hp+r0/z6u2Lr07ED5pFBWNF7j2thIygOmLxmP2gr5UeVIXfIH6i/OSmZ8HdQFk45cZbxs4Si5v+7938v/8LQVv5XtpEzQ==",
+      "block_hash": "a4ef3d786d7bfb1bbee966ba9696164dc61156edfc8a3fe62a2ef6a27199b743",
+      "flagged": false,
+      "flag_reason": ""
+    },
+    {
+      "block_index": 2,
+      "package_id": "PKG-2024-PHARMA-001",
+      "node_id": "cb145622-c5ae-4275-b41c-2fa0320cf240",
+      "node_name": "Truck",
+      "timestamp": "2024-01-15T08:00:00Z",
+      "lat": 13.5,
+      "lon": 79.8,
+      "wifi_fingerprint": [
+        {
+          "bssid": "aa:bb:cc:dd:ee:11",
+          "rssi": -85,
+          "ssid": "Toll_Plaza_Free"
+        },
+        {
+          "bssid": "aa:bb:cc:dd:ee:22",
+          "rssi": -90,
+          "ssid": "Dhaba_Net"
+        },
+        {
+          "bssid": "aa:bb:cc:dd:ee:33",
+          "rssi": -70,
+          "ssid": "Truck_Hotspot"
+        }
+      ],
+      "prev_hash": "a4ef3d786d7bfb1bbee966ba9696164dc61156edfc8a3fe62a2ef6a27199b743",
+      "claim_hash": "12b5261e19e8b754e5f821ab7088cc38862894a69385ff536fdf054e3cf417fc",
+      "signature": "oAMdyl36he3QRwLdC6wl+eIUyEeAm/7VYZ88s/BkeLyYj52EnfYSMNwa82vxl4CBs9TrW3mO+D8z80Di1JF5gMPJhC9FFHFk1yddgRQ5+yJm51vt16DlhIYgWK2KpQX0SlQ9bxzzUwqWAa7eUFx7DEnPfNMMqTJDWUzk7iofPj/UJw5ZuIL96tbN+Yt/n24tvSta9yi4w7cq3Z6mdZVOqITCPdEojeuTw/s5va5Yo1+MCE5Uxz9ceL59zh5txMwFoU42hTI1tFfN2kEGAUacOHiTpuYWxItBFF/wjm/j2rd32dQ6hL018m7x5Hr9wPor6Z/flphHuS8kkSRZosyMBw==",
+      "block_hash": "4a33683fb94d8414b52062d117a36c8bc5fd7a2016538623b14a28363091fdcf",
+      "flagged": false,
+      "flag_reason": ""
+    },
+    {
+      "block_index": 3,
+      "package_id": "PKG-2024-PHARMA-001",
+      "node_id": "268b4adf-7d0d-4598-86d6-e3d072deea41",
+      "node_name": "Warehouse",
+      "timestamp": "2024-01-15T13:00:00Z",
+      "lat": 12.9716,
+      "lon": 77.5946,
+      "wifi_fingerprint": [
+        {
+          "bssid": "11:22:33:44:55:66",
+          "rssi": -50,
+          "ssid": "WH_Corp_Network"
+        },
+        {
+          "bssid": "11:22:33:44:55:77",
+          "rssi": -55,
+          "ssid": "WH_IoT"
+        },
+        {
+          "bssid": "11:22:33:44:55:88",
+          "rssi": -80,
+          "ssid": "Blr_City_Wifi"
+        }
+      ],
+      "prev_hash": "4a33683fb94d8414b52062d117a36c8bc5fd7a2016538623b14a28363091fdcf",
+      "claim_hash": "0047b042a8a7774f0f631c5122018086786008d978429b4cebb176a2dc1af67a",
+      "signature": "lSAxpUGDwgccrqt/Z+WrIGn+b6riv0L4pwErj97LdhDvK8Cco8iOQMv7iilq/GCep7O/joMiF1+Z9Efmf+BZRE3C4msQ91Iw7BFyeyJAweS32p49wSbH+v4ISGAQFd6BvV+bE5RktTnW4ikPpd2k7hRT+St+6s4UEk28B5dGbu0x3molngfBHpqJj1wUF+GEUoO4d3JpsHewnvxZ1tllTRNDNHIw6EAcOvbvyIVLF3ZLc6z23EY7ZspRyZkU1ZqP4g4B4lc5W7oKk6KOPr6Q5C1k7FZ8VPbY+a6VjltIHkXHaLd0p17in9VeV2FqLyrMxswzpWYMW8xrGFxI8jWepw==",
+      "block_hash": "7a14c50add8a8ee20281937524373d41c6a12cda731b62bf499cfce8dcc3643a",
+      "flagged": false,
+      "flag_reason": ""
+    },
+    {
+      "block_index": 4,
+      "package_id": "PKG-2024-PHARMA-001",
+      "node_id": "a1071118-5b49-4b0f-8608-1c40f81e8aa9",
+      "node_name": "Retail Store",
+      "timestamp": "2024-01-15T15:00:00Z",
+      "lat": 12.7409,
+      "lon": 77.8253,
+      "wifi_fingerprint": [
+        {
+          "bssid": "ff:ee:dd:cc:bb:aa",
+          "rssi": -40,
+          "ssid": "Retail_POS"
+        },
+        {
+          "bssid": "ff:ee:dd:cc:bb:ab",
+          "rssi": -65,
+          "ssid": "Retail_Guest"
+        },
+        {
+          "bssid": "ff:ee:dd:cc:bb:ac",
+          "rssi": -75,
+          "ssid": "Mall_Wifi_Free"
+        }
+      ],
+      "prev_hash": "7a14c50add8a8ee20281937524373d41c6a12cda731b62bf499cfce8dcc3643a",
+      "claim_hash": "20b78fb8b4b1ca4dced819b997d2c34912f91ba30c3d1cf01642b93782c35c3f",
+      "signature": "fd4MoTR4zBLZz3p0N5q0/XuKIbsHKrwzfjWeVHVUkPIGlAWm7MlWp1xmwj0R1iLvReIXmg4b+jaUj10YpSv/xVsoviXBYBNXWJd1YSgUDoQYgyUZ1dZFspHI7gkahUpfyaneGiwuwkYirQdULd/QjeKqsAQshRQ2z2PsRpUDbKMRkAlcOyALVaIi8ObAqT2/Vf37mdfWVsuEHrzHfHeXVw2nm24Q/WtHFl1KwTE+UTtp0bUL78X9zddthh2oInId+O2BPpv/sqQHnyHD86PRuPBC9LD08zOxtWHQ5pumZFhkG73hAHK+8MVNP93SopwX9V2BPt3OEKfWsxLzw9py0g==",
+      "block_hash": "4cec5b29977aa6be169bd594eec34a20c9f1233447f31aa01a9b72bd6827f586",
+      "flagged": false,
+      "flag_reason": ""
+    }
+  ]
+}

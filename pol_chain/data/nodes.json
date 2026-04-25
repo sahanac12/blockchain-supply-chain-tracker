@@ -1,0 +1,26 @@
+[
+  {
+    "name": "Factory",
+    "location_name": "Chennai, India",
+    "lat": 13.0827,
+    "lon": 80.2707
+  },
+  {
+    "name": "Truck",
+    "location_name": "On NH48 highway",
+    "lat": 13.5,
+    "lon": 79.8
+  },
+  {
+    "name": "Warehouse",
+    "location_name": "Bengaluru, India",
+    "lat": 12.9716,
+    "lon": 77.5946
+  },
+  {
+    "name": "Retail Store",
+    "location_name": "Hosur, India",
+    "lat": 12.7409,
+    "lon": 77.8253
+  }
+]
