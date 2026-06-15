@@ -1,24 +1,24 @@
-# 🛡️ Decentralized Proof-of-Location (POL) Supply Chain Tracker
+# Decentralized Proof-of-Location (POL) Supply Chain Tracker
 
 A security-focused, decentralized location-attestation ledger designed to secure global supply chain provenance. This project leverages **ECDSA cryptography**, bottom-up **Merkle Trees**, and a **Proof-of-Authority (PoA)** consensus quorum to guarantee immutable, coordinate-forgery-proof physical tracking records.
 
 ---
 
-## 🌟 Core Features
+## Core Features
 
 - **Double-Signature Attestation**: Leverages a dual-signature scheme where local Location Beacons (representing physical locations) and Logistics Gateway Nodes (scanning nodes) must sign attestations.
 - **Proof-of-Authority Consensus**: Blocks are validated and appended to the ledger via a quorum of authorized validator nodes, securing the network from state manipulation.
 - **Merkle Tree Proofs**: Implements bottom-up Merkle Tree construction for verified transactions in each block, allowing lightweight clients to verify transaction membership using sibling path proofs.
 - **Red Team Security Sandbox**: Simulates and defends against four critical attack vectors:
-  - 🔄 **Replay Attacks** (caught by a 300-second temporal freshness constraint)
-  - 🗺️ **GPS Coordinate Forgery** (caught by validating the beacon signature against coordinates)
-  - 🍴 **Double-Location Fork Attacks** (caught by state tracking verification)
-  - ✍️ **Signature Tampering** (caught by public key verification)
+  - **Replay Attacks** (caught by a 300-second temporal freshness constraint)
+  - **GPS Coordinate Forgery** (caught by validating the beacon signature against coordinates)
+  - **Double-Location Fork Attacks** (caught by state tracking verification)
+  - **Signature Tampering** (caught by public key verification)
 - **Interactive Dashboards**: Features a static Web Console built with HTML/JS and a premium Streamlit dashboard with HSL dark-mode styling and live geographical maps.
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```text
 ├── app/                  # FastAPI Application
@@ -51,7 +51,7 @@ A security-focused, decentralized location-attestation ledger designed to secure
 
 ---
 
-## ⚙️ Setup and Installation
+## Setup and Installation
 
 ### Prerequisites
 - Python 3.10+ installed on your system.
@@ -65,7 +65,7 @@ A security-focused, decentralized location-attestation ledger designed to secure
 
 ---
 
-## 🚀 Running the Project
+## Running the Project
 
 ### Option 1: Native Execution (Recommended)
 You can run the application servers natively in separate terminals:
@@ -99,7 +99,7 @@ docker-compose up --build
 
 ---
 
-## 🧪 Running Unit Tests
+## Running Unit Tests
 
 To run the security testing suites and verify the cryptographic integrity of the ledger:
 ```bash
