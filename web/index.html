@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POL Supply Chain Provenance Console</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Space+Mono&display=swap" rel="stylesheet">
+    <!-- Leaflet Map CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css?v=12">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i data-lucide="shield" class="sidebar-logo-icon"></i>
+                <h2>POL Console</h2>
+            </div>
+            <p class="sidebar-subtitle">POL</p>
+            <div class="connection-status" id="connection-status">
+                <span class="status-indicator yellow"></span> Connecting to API...
+            </div>
+            
+            <nav class="nav-menu">
+                <button class="nav-btn active" data-tab="simulation-tab">
+                    <i data-lucide="map" class="nav-icon"></i>
+                    <span>Route Simulator</span>
+                </button>
+                <button class="nav-btn" data-tab="explorer-tab">
+                    <i data-lucide="database" class="nav-icon"></i>
+                    <span>Blockchain Ledger</span>
+                </button>
+                <button class="nav-btn" data-tab="auditor-tab">
+                    <i data-lucide="shield-check" class="nav-icon"></i>
+                    <span>Package History Auditor</span>
+                </button>
+                <button class="nav-btn" data-tab="attacks-tab">
+                    <i data-lucide="shield-alert" class="nav-icon"></i>
+                    <span>Attack Simulator</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-stats">
+                <h3 class="sidebar-stats-title">
+                    <i data-lucide="bar-chart-3" class="stat-header-icon"></i>
+                    <span>Ledger Stats</span>
+                </h3>
+                <div class="stat-row"><span>Blocks:</span> <strong id="stat-blocks">0</strong></div>
+                <div class="stat-row"><span>Mempool:</span> <strong id="stat-mempool">0</strong></div>
+                <div class="stat-row"><span>Beacons:</span> <strong id="stat-beacons">0</strong></div>
+                <div class="stat-row"><span>Nodes:</span> <strong id="stat-nodes">0</strong></div>
+            </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="main-content">
+            <!-- TAB 1: SIMULATION -->
+            <section id="simulation-tab" class="tab-content active">
+                <div class="tab-header">
+                    <h1><i data-lucide="map" class="main-header-icon"></i> Route Simulator</h1>
+                    <p>Simulate package scans at geographic checkpoints with real-time DOM-based mapping.</p>
+                </div>
+
+                <div class="grid-2">
+                    <div class="card-column">
+                        <div class="glass-card">
+                            <h3>Initialize Shipment</h3>
+                            <div class="form-group">
+                                <label for="select-route">Logistics Route Path</label>
+                                <select id="select-route">
+                                    <option value="standard_delivery">Warehouse ──► Delivery Truck ──► Retail Store</option>
+                                    <option value="electronics_import">Electronics Import (Shenzhen ──► NYC)</option>
+                                    <option value="pharmaceuticals_cold_chain">Pharma Cold Chain (Munich ──► Miami)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="input-pkg-id">Package ID / Serial</label>
+                                <input type="text" id="input-pkg-id" value="PKG-DELIVERY-01" placeholder="Enter ID">
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px;">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label for="input-init-lat">Latitude (Optional)</label>
+                                    <input type="number" id="input-init-lat" step="any" placeholder="e.g. 34.0522">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label for="input-init-lon">Longitude (Optional)</label>
+                                    <input type="number" id="input-init-lon" step="any" placeholder="e.g. -118.2437">
+                                </div>
+                            </div>
+                            <button id="btn-initialize" class="btn primary">Initialize & Scan Package</button>
+                        </div>
+
+                        <div class="glass-card">
+                            <h3>Move Package Forward</h3>
+                            <div class="form-group">
+                                <label for="select-active-pkg">Select Active Package</label>
+                                <select id="select-active-pkg">
+                                    <option value="">-- No active packages --</option>
+                                </select>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px;">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label for="input-move-lat">Latitude (Optional)</label>
+                                    <input type="number" id="input-move-lat" step="any" placeholder="e.g. 34.1425">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label for="input-move-lon">Longitude (Optional)</label>
+                                    <input type="number" id="input-move-lon" step="any" placeholder="e.g. -118.2551">
+                                </div>
+                            </div>
+                            <button id="btn-advance" class="btn secondary">Register Next Location Scan</button>
+                        </div>
+
+                        <div class="glass-card" id="custom-route-card" style="display: none;">
+                            <h3>Custom Route Creator</h3>
+                            <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.4;">
+                                Define your own supply chain path. Enable Draw Mode and click on the Leaflet Map to place checkpoints.
+                            </p>
+                            <div class="form-group">
+                                <label for="input-custom-route-name">Route Name</label>
+                                <input type="text" id="input-custom-route-name" placeholder="e.g. London-Paris Express">
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+                                <button id="btn-draw-mode" class="btn secondary" style="font-size: 0.8rem; padding: 8px;">Draw Mode: OFF</button>
+                                <button id="btn-clear-draw" class="btn danger" style="font-size: 0.8rem; padding: 8px;">Clear Pins</button>
+                            </div>
+                            <button id="btn-save-custom-route" class="btn primary" disabled>Register Custom Route</button>
+                        </div>
+
+                        <div class="glass-card" id="automation-controls-card" style="display: none;">
+                            <h3>Automation Controls</h3>
+                            <div style="display: flex; flex-direction: column; gap: 14px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <strong style="font-size: 0.9rem;">Auto-Transit Package</strong>
+                                        <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 2px;">Automatically scan at checkpoints every 5 seconds.</p>
+                                    </div>
+                                    <label class="switch-toggle">
+                                        <input type="checkbox" id="toggle-auto-transit">
+                                        <span class="slider-round"></span>
+                                    </label>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 12px;">
+                                    <div>
+                                        <strong style="font-size: 0.9rem;">Auto-Mine Blocks</strong>
+                                        <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 2px;">Automatically build and sign blocks every 8 seconds.</p>
+                                    </div>
+                                    <label class="switch-toggle">
+                                        <input type="checkbox" id="toggle-auto-mine">
+                                        <span class="slider-round"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="map-column">
+                        <div class="glass-card map-card">
+                            <h3>Live Package Routing Coordinates</h3>
+                            <div id="selected-package-path-title" style="margin-bottom: 10px; font-weight: 600; color: #60A5FA;">Select a package to view track</div>
+                            <div id="progress-stepper-container"></div>
+                            <div id="map"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: BLOCK EXPLORER -->
+            <section id="explorer-tab" class="tab-content">
+                <div class="tab-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h1><i data-lucide="database" class="main-header-icon"></i> Blockchain Ledger Database</h1>
+                        <p>View confirmed blockchain headers, transactions, and consensus signatures.</p>
+                    </div>
+                    <button id="btn-reset-ledger" class="btn danger" style="width: auto; padding: 10px 20px;">Reset Ledger & Simulation</button>
+                </div>
+                
+                <div class="glass-card">
+                    <h3>Pending Queue (Mempool)</h3>
+                    <p class="mempool-subtitle">Pending location scans waiting to be mined onto the ledger.</p>
+                    <div class="mempool-action-bar">
+                        <span id="mempool-count-label">0 pending transactions</span>
+                        <button id="btn-mine" class="btn accent">Mine to Blockchain</button>
+                    </div>
+                    <div class="table-container">
+                        <table id="mempool-table">
+                            <thead>
+                                <tr>
+                                    <th>Pkg ID</th>
+                                    <th>Node ID</th>
+                                    <th>Beacon ID</th>
+                                    <th>Location</th>
+                                    <th>Time</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td colspan="6" class="center-text">Queue is empty.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="glass-card" style="margin-top: 24px;">
+                    <h3>Quarantined Threat Log</h3>
+                    <p class="mempool-subtitle">Isolated transactions flagged as security attacks by consensus validation.</p>
+                    <div class="table-container">
+                        <table id="quarantine-table">
+                            <thead>
+                                <tr>
+                                    <th>Pkg ID</th>
+                                    <th>Node ID</th>
+                                    <th>Beacon ID</th>
+                                    <th>Location</th>
+                                    <th>Time Flagged</th>
+                                    <th>Threat</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td colspan="6" class="center-text">No quarantined transactions.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="block-chain-view" id="block-chain-container">
+                    <h3>Ledger Blocks</h3>
+                    <!-- Dynamic Blocks go here -->
+                </div>
+            </section>
+
+            <!-- TAB 2: PROVENANCE AUDITOR -->
+            <section id="auditor-tab" class="tab-content">
+                <div class="print-only-header">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 3px double #111827; padding-bottom: 12px; margin-bottom: 24px;">
+                        <div>
+                            <h1 style="font-size: 1.8rem; font-weight: 800; color: #111827; margin: 0; font-family: 'Outfit', sans-serif;">PROOF-OF-LOCATION (POL)</h1>
+                            <h2 style="font-size: 0.95rem; font-weight: 600; color: #4B5563; margin: 4px 0 0 0; text-transform: uppercase; letter-spacing: 0.05em; font-family: 'Outfit', sans-serif;">Cryptographic Provenance Forensic Report</h2>
+                        </div>
+                        <div style="text-align: right; font-family: 'Outfit', sans-serif;">
+                            <div style="font-size: 0.85rem; font-weight: 700; color: #111827;">CONFIDENTIAL SECURITY AUDIT</div>
+                            <div style="font-size: 0.75rem; color: #6B7280; margin-top: 2px;">Immutable Blockchain Ledger v1.2</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-header">
+                    <h1><i data-lucide="shield-check" class="main-header-icon"></i> Package History Auditor</h1>
+                    <p>Audit and verify the secure history and digital signatures of any package.</p>
+                </div>
+                <div class="glass-card">
+                    <h3>Verify Package Journey</h3>
+                    <div class="search-bar">
+                        <input type="text" id="search-pkg-input" placeholder="e.g. PKG-DELIVERY-01">
+                        <button id="btn-audit" class="btn primary">Run Verification Audit</button>
+                    </div>
+                    <div id="audit-status-badge" class="badge-container"></div>
+                    <div id="audit-history-timeline" class="audit-timeline">
+                        <p class="info-text">Enter a Package ID above to inspect its cryptographic verification logs.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 4: RED TEAM SANDBOX -->
+            <section id="attacks-tab" class="tab-content">
+                <div class="tab-header">
+                    <h1><i data-lucide="shield-alert" class="main-header-icon"></i> Security Attack Simulator</h1>
+                    <p>Test the blockchain's resilience by simulating various attacks on the location system.</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="select-attack-pkg">Select Target Package</label>
+                    <select id="select-attack-pkg">
+                        <option value="">-- No packages --</option>
+                    </select>
+                </div>
+
+                <div class="attack-grid">
+                    <div class="glass-card attack-card">
+                        <h4>1. Beacon Replay Attack</h4>
+                        <p>Attempts to reuse an expired beacon token captured from a past scan.</p>
+                        
+                        <!-- Parametric Control -->
+                        <div class="form-group" style="background: rgba(0,0,0,0.15); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.03);">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.75rem; font-weight: 600;">
+                                <span style="color: var(--text-secondary);">Replay Age Offset:</span>
+                                <span id="label-replay-delay" style="color: var(--warning-yellow);">7200s (2 hrs)</span>
+                            </div>
+                            <input type="range" id="input-replay-delay" min="10" max="7200" step="10" value="7200" style="padding: 0; background: transparent; height: 6px; cursor: pointer; border: none; width: 100%;">
+                            <div style="display: flex; justify-content: space-between; font-size: 0.65rem; color: var(--text-secondary); margin-top: 4px;">
+                                <span>10s (Valid)</span>
+                                <span>300s (Limit)</span>
+                                <span>2 hrs (Attack)</span>
+                            </div>
+                        </div>
+                        
+                        <div class="attack-buttons-container">
+                            <button class="btn danger btn-attack" data-attack="replay">Launch Attack</button>
+                            <button class="btn secondary btn-learn" data-learn="replay">Learn More</button>
+                        </div>
+                    </div>
+
+                    <div class="glass-card attack-card">
+                        <h4>2. Double-Location Fork Attack</h4>
+                        <p>Clones a tag and scans it at two locations simultaneously, creating a state fork.</p>
+                        
+                        <!-- Parametric Control -->
+                        <div class="form-group" style="background: rgba(0,0,0,0.15); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.03);">
+                            <label for="select-fork-node" style="font-size: 0.75rem; margin-bottom: 4px; display: block; font-weight: 600; color: var(--text-secondary);">Fork Scan Counterfeit Node</label>
+                            <select id="select-fork-node" style="padding: 6px 8px; font-size: 0.8rem; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); width: 100%;">
+                                <option value="NODE-304">NODE-304 (Dallas Logistics Hub)</option>
+                                <option value="NODE-102">NODE-102 (Silk Board Transit)</option>
+                                <option value="NODE-203">NODE-203 (ORR Cargo Hub)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="attack-buttons-container">
+                            <button class="btn danger btn-attack" data-attack="fork">Launch Attack</button>
+                            <button class="btn secondary btn-learn" data-learn="fork">Learn More</button>
+                        </div>
+                    </div>
+
+                    <div class="glass-card attack-card">
+                        <h4>3. Signature Tampering</h4>
+                        <p>Alters details in transit and submits the packet with a corrupted signature.</p>
+                        <div class="attack-buttons-container">
+                            <button class="btn danger btn-attack" data-attack="invalid_signature">Launch Attack</button>
+                            <button class="btn secondary btn-learn" data-learn="invalid_signature">Learn More</button>
+                        </div>
+                    </div>
+
+                    <div class="glass-card attack-card">
+                        <h4>4. Location Coordinate Forgery</h4>
+                        <p>Modifies the coordinates in a scanned packet after the beacon has signed it.</p>
+                        
+                        <!-- Parametric Control -->
+                        <div class="form-group" style="background: rgba(0,0,0,0.15); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.03);">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.75rem; font-weight: 600;">
+                                <span style="color: var(--text-secondary);">Spoofed GPS Offset:</span>
+                                <span id="label-gps-offset" style="color: var(--danger-red);">+2.5000°</span>
+                            </div>
+                            <input type="range" id="input-gps-offset" min="0.0001" max="5.0" step="0.01" value="2.5" style="padding: 0; background: transparent; height: 6px; cursor: pointer; border: none; width: 100%;">
+                            <div style="display: flex; justify-content: space-between; font-size: 0.65rem; color: var(--text-secondary); margin-top: 4px;">
+                                <span>0.0001° (Micro)</span>
+                                <span>1.0° (Medium)</span>
+                                <span>5.0° (Severe)</span>
+                            </div>
+                        </div>
+                        
+                        <div class="attack-buttons-container">
+                            <button class="btn danger btn-attack" data-attack="gps_forgery">Launch Attack</button>
+                            <button class="btn secondary btn-learn" data-learn="gps_forgery">Learn More</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card console-card">
+                    <h3>Security Alert Terminal Log</h3>
+                    <pre id="console-output">Terminal ready. Launch an attack vector to monitor system logs...</pre>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Premium Custom Modal Notifications -->
+    <div id="custom-modal" class="modal-overlay">
+        <div class="modal-box glass-card">
+            <div class="modal-header">
+                <span id="modal-icon"></span>
+                <h3 id="modal-title">Notification</h3>
+            </div>
+            <div class="modal-body" id="modal-message">Message details go here.</div>
+            <div class="modal-footer">
+                <button id="modal-close-btn" class="btn primary">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Attack Simulator Interactive Visual Modal -->
+    <div id="security-visual-modal" class="modal-overlay">
+        <div class="modal-box glass-card security-modal-box">
+            <div class="modal-header">
+                <span id="security-modal-icon"></span>
+                <h3 id="security-modal-title">Security Attack Visualization</h3>
+                <span id="security-modal-badge" class="attack-status-badge">BLOCKED</span>
+            </div>
+            <div class="modal-body">
+                <!-- Visual Pipeline Diagram Container -->
+                <div class="attack-visual-container" id="security-visual-flow">
+                    <!-- Flow nodes and animations will be injected here dynamically -->
+                </div>
+                
+                <!-- Information Grid -->
+                <div class="attack-details-grid">
+                    <div class="detail-column">
+                        <h4>Attack Mechanism</h4>
+                        <p id="security-modal-mechanism">Details about how the attack works.</p>
+                    </div>
+                    <div class="detail-column">
+                        <h4>Real-World Context</h4>
+                        <p id="security-modal-context">Where it is typically used in the real world.</p>
+                    </div>
+                    <div class="detail-column" style="grid-column: span 2;">
+                        <h4>How POL Mitigates</h4>
+                        <p id="security-modal-defense">How POL mitigates this attack.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="security-modal-close-btn" class="btn primary">Got It</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Security Alert Modal -->
+    <div id="security-alert-modal" class="modal-overlay">
+        <div class="modal-box glass-card security-alert-modal-box">
+            <div class="modal-header security-alert-header">
+                <i data-lucide="shield-alert" class="alert-icon"></i>
+                <h3 style="margin-left: 8px;">Consensus Security Alert</h3>
+                <span class="attack-status-badge blocked">BLOCKED</span>
+            </div>
+            <div class="modal-body" id="security-alert-body">
+                <!-- Visual warning container injected dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button id="security-alert-close-btn" class="btn danger" style="width: auto; padding: 8px 24px;">Quarantine & Resume</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet Map JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <!-- Custom JS -->
+    <script src="app.js?v=12"></script>
+</body>
+</html>
